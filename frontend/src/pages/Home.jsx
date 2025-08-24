@@ -1,6 +1,8 @@
-import { CirclePlus } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { CirclePlus } from "lucide-react";
 import BlogCards from "../components/BlogCards";
+import DialogForm from "../components/DialogForm";
 
 const Home = () => {
   const blog = [
@@ -62,13 +64,16 @@ const Home = () => {
     },
   ];
 
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div>
       <div className="flex items-center justify-between max-w-3xl mx-auto mt-16">
-        <Link className="text-3xl font-bold" to="/">
-          My Blog
-        </Link>
-        <button className="flex items-center gap-2 bg-black text-white p-2 rounded-lg">
+        <Link className="text-3xl font-bold" to='/'>My Blog</Link>
+        <button
+         className="flex items-center gap-2 bg-black text-white p-2 rounded-lg btn-hover"
+         onClick={() => setIsOpen(true)}
+        >
           <CirclePlus size={18} />
           New Post
         </button>
@@ -79,6 +84,8 @@ const Home = () => {
           <BlogCards key={blog.id} blog={blog} />
         ))}
       </div>
+
+        <DialogForm isOpen={isOpen} onClose={() => setIsOpen(false)}/>
     </div>
   );
 };
