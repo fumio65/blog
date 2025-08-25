@@ -1,70 +1,46 @@
 import { useState, useEffect } from "react";
+
 import { Link } from "react-router-dom";
 import { CirclePlus } from "lucide-react";
+
+import { getBlogs } from "../services/api";
+
 import BlogCards from "../components/BlogCards";
 import DialogForm from "../components/DialogForm";
 
 const Home = () => {
-  const blog = [
-    {
-      id: 1,
-      title: "Do Hard Things if you want an Easy Life",
-      description: "The one skill that changes everything",
-      author: "Fumio",
-      date: "Aug 20, 2024",
-    },
-    {
-      id: 1,
-      title: "Do Hard Things if you want an Easy Life",
-      description: "The one skill that changes everything",
-      author: "Fumio",
-      date: "Aug 20, 2024",
-    },
-    {
-      id: 1,
-      title: "Do Hard Things if you want an Easy Life",
-      description: "The one skill that changes everything",
-      author: "Fumio",
-      date: "Aug 20, 2024",
-    },
-    {
-      id: 1,
-      title: "Do Hard Things if you want an Easy Life",
-      description: "The one skill that changes everything",
-      author: "Fumio",
-      date: "Aug 20, 2024",
-    },
-    {
-      id: 1,
-      title: "Do Hard Things if you want an Easy Life",
-      description: "The one skill that changes everything",
-      author: "Fumio",
-      date: "Aug 20, 2024",
-    },
-    {
-      id: 1,
-      title: "Do Hard Things if you want an Easy Life",
-      description: "The one skill that changes everything",
-      author: "Fumio",
-      date: "Aug 20, 2024",
-    },
-    {
-      id: 1,
-      title: "Do Hard Things if you want an Easy Life",
-      description: "The one skill that changes everything",
-      author: "Fumio",
-      date: "Aug 20, 2024",
-    },
-    {
-      id: 1,
-      title: "Do Hard Things if you want an Easy Life",
-      description: "The one skill that changes everything",
-      author: "Fumio",
-      date: "Aug 20, 2024",
-    },
-  ];
-
+  const [blog, setBlog] = useState([]);
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true);  
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const data = await getBlogs();
+        setBlog(data);
+        console.log(data)
+      } catch (err) {
+        if (err.message === 'Network Error' || !err.response) {
+          setError('Server is uncreachable. Please try again later.')
+        } else {
+          setError('An error occurred while fetching the blogs. Please try again later.')
+        } 
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchBlogs();
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen border border-black">
+        <p className="text-3xl text-description">Loading...</p>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -74,7 +50,7 @@ const Home = () => {
          className="flex items-center gap-2 bg-black text-white p-2 rounded-lg btn-hover"
          onClick={() => setIsOpen(true)}
         >
-          <CirclePlus size={18} />
+          <CirclePlus size={16} />
           New Post
         </button>
       </div>

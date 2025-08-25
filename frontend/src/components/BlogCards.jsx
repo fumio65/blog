@@ -16,7 +16,11 @@ const BlogCards = ({ blog }) => {
           </div>
           <div className="flex items-center gap-2 text-description">
             <Calendar size={16} />
-            {blog.date}
+            {new Date(blog.created_at).toLocaleDateString("en-US", {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            })}
           </div>
         </div>
       </div>
