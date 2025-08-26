@@ -34,6 +34,10 @@ const Home = () => {
     fetchBlogs();
   }, [])
 
+  const addBlog = (newBlog) => {
+    setBlog(prev => [newBlog, ...prev])
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen border border-black">
@@ -61,7 +65,11 @@ const Home = () => {
         ))}
       </div>
 
-        <DialogForm isOpen={isOpen} onClose={() => setIsOpen(false)}/>
+        <DialogForm
+         isOpen={isOpen}
+         onClose={() => setIsOpen(false)}
+         onBlogAdded={addBlog} 
+        />
     </div>
   );
 };
