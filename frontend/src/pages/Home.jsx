@@ -19,10 +19,9 @@ const Home = () => {
       try {
         const data = await getBlogs();
         setBlog(data);
-        console.log(data)
       } catch (err) {
         if (err.message === 'Network Error' || !err.response) {
-          setError('Server is uncreachable. Please try again later.')
+          setError('Server is unreachable. Please try again later.')
         } else {
           setError('An error occurred while fetching the blogs. Please try again later.')
         } 
