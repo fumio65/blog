@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { validateBlog } from "../utils/validation";
-import { createBlog } from "../services/api";
+import { createBlog, updateBlog } from "../services/api";
 
-const DialogForm = ({ isOpen, onClose, onBlogAdded }) => {
+const DialogForm = ({ blog = {}, isOpen, onClose, onBlogAdded, onBlogUpdated }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [success, setSuccess] = useState("");
@@ -15,6 +15,13 @@ const DialogForm = ({ isOpen, onClose, onBlogAdded }) => {
 
   // Use ref to store timeout ID for cleanup
   const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (blog.title) setTitle(blog.title);
+    if (blog.content) setContent(blog.content);
+    console.log(title);
+    console.log(content);
+  }, [blog, isOpen]);
 
   const resetForm = () => {
     setTitle("");
@@ -69,13 +76,69 @@ const DialogForm = ({ isOpen, onClose, onBlogAdded }) => {
       return;
     }
 
+    // Close dialog after a brief delay to show success message
+    const SUCCESS_MESSAGE_DELAY = 1500;
+
+    if (blog?.id) {
+      try {
+        const updated = await updateBlog(blog.id, { title, content });
+        onBlogUpdated?.(updated);
+        setSuccess("Blog updated successfully!");
+
+        timeoutRef.current = setTimeout(() => {
+          onClose();
+        }, SUCCESS_MESSAGE_DELAY);
+      } catch (error) {
+        const response = error?.response?.data;
+        let handled = false;
+
+        if (
+          response?.title &&
+          Array.isArray(response.title) &&
+          response.title.length > 0
+        ) {
+          setFieldErrors((prev) => ({
+            ...prev,
+            title: response.title[0],
+          }));
+          handled = true;
+        }
+
+        if (
+          response?.content &&
+          Array.isArray(response.content) &&
+          response.content.length > 0
+        ) {
+          setFieldErrors((prev) => ({
+            ...prev,
+            content: response.content[0],
+          }));
+          handled = true;
+        }
+
+        if (
+          error.code === "NETWORK_ERROR" ||
+          error.message === "Network Error" ||
+          !error.response ||
+          error.response.status >= 500
+        ) {
+          setFormError("Server is unreachable. Please try again later.");
+        } else if (!handled) {
+          console.log("Errorrrrrrrr")
+          setFormError("Failed to update blog. Please try again later.");
+        }
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
     try {
       const newBlog = await createBlog({ title, content });
-      onBlogAdded(newBlog);
+      console.log('HAHA')
+      onBlogAdded?.(newBlog);
       setSuccess("Blog created successfully!");
 
-      // Close dialog after a brief delay to show success message
-      const SUCCESS_MESSAGE_DELAY = 1500;
       timeoutRef.current = setTimeout(() => {
         onClose();
       }, SUCCESS_MESSAGE_DELAY);
@@ -127,7 +190,7 @@ const DialogForm = ({ isOpen, onClose, onBlogAdded }) => {
   return (
     <div className="border border-blue-500 fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
       <div className="bg-white border border-black max-w-xl rounded-md mx-auto mt-32">
-        <h1 className="text-xl font-bold p-6 border-b">Create a new blog</h1>
+        <h1 className="text-xl font-bold p-6 border-b">{blog?.id ? "Edit blog" : "Create a new blog"}</h1>
         <form onSubmit={handleSubmit} className="space-y-4 p-6">
           <div className="flex flex-col flex-1">
             <label

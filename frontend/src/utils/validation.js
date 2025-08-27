@@ -22,7 +22,7 @@ export const validateBlog = ({ title, content }) => {
         errors.content = 'Content is required';
         hasError = true
     }
-    else if (content < 10) {
+    else if (content.length < 10) {
         errors.content = 'Content must be at least 10 characters long';
         hasError = true
     }
