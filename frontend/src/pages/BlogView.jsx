@@ -129,7 +129,7 @@ const BlogView = () => {
         {/* Meta info */}
         <div className="flex gap-6 text-sm text-gray-500 border-b pb-3 mb-4">
           <div className="flex items-center gap-1">
-            <User size={16} /> {blog.author || "Anonymous"}
+            <User size={16} /> {blog.author_name || blog.author_details?.full_name || "Anonymous"}
           </div>
           <div className="flex items-center gap-1">
             <Calendar size={16} />
